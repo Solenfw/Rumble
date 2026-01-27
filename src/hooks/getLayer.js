@@ -1,12 +1,14 @@
 import * as THREE from "three";
+import radGradPath from "../assets/rad-grad.png";
 
 const loader = new THREE.TextureLoader();
+const sharedTexture = loader.load(radGradPath);
 
-function getSprite({ hasFog, color, opacity, path, pos, size }) {
+function getSprite({ hasFog, color, opacity, pos, size }) {
   const spriteMat = new THREE.SpriteMaterial({
     color,
     fog: hasFog,
-    map: loader.load(path),
+    map: sharedTexture,
     transparent: true,
     opacity,
   });
@@ -24,7 +26,6 @@ export function getLayer({
   hue = 0.0,
   numSprites = 10,
   opacity = 1,
-  path = "../assets/rad-grad.png",
   radius = 1,
   sat = 0.5,
   size = 1,
@@ -42,7 +43,7 @@ export function getLayer({
     // const hue = 0.0; // (0.9 - (radius - length) / radius) * 1;
 
     let color = new THREE.Color().setHSL(hue, 1, sat);
-    const sprite = getSprite({ hasFog, color, opacity, path, pos, size });
+    const sprite = getSprite({ hasFog, color, opacity, pos, size });
     layerGroup.add(sprite);
   }
   return layerGroup;
