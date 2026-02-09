@@ -24,9 +24,5 @@ export const getMagnitudeLabel = (magnitude : number) : string => {
  * Convert magnitude to marker size scale
  */
 export const magnitudeToSize = (magnitude : number) : number => {
-<<<<<<< HEAD
-  return Math.max(0.002, magnitude * 0.002);
-=======
   return Math.max(0.002, magnitude * 0.0015);
->>>>>>> 47fa0bd (quick commits)
 };
