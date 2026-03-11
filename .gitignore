@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 # === Logs ===
 logs/
+=======
+# Logs
+logs
+>>>>>>> b13f02f (first commit)
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,6 +12,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+<<<<<<< HEAD
 # === Node / JS ===
 node_modules/
 dist/
@@ -49,10 +55,23 @@ pip-wheel-metadata/
 .vscode/*
 !.vscode/extensions.json
 .idea/
+=======
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+>>>>>>> b13f02f (first commit)
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+<<<<<<< HEAD
 
 # === OS junk ===
 .DS_Store
@@ -69,3 +88,6 @@ temp.js
 temp.py
 tmp/
 temp/
+=======
+*.sw?
+>>>>>>> b13f02f (first commit)

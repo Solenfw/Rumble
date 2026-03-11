@@ -22,5 +22,11 @@ export default defineConfig([
         sourceType: 'module',
       },
     },
+<<<<<<< HEAD
+=======
+    rules: {
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+>>>>>>> b13f02f (first commit)
   },
 ])
