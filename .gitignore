@@ -17,6 +17,7 @@ dist-ssr/
 coverage/
 
 # === Python / venv / cache ===
+server/.env
 .venv/
 venv/
 env/
