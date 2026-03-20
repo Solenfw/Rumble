@@ -65,7 +65,7 @@ const Settings: React.FC = () => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white w-full max-w-4xl rounded-sm shadow-2xl flex flex-col overflow-hidden min-h-[600px]">
+      <div className="bg-white w-full max-w-4xl rounded-sm shadow-2xl flex flex-col overflow-hidden min-h-150">
         {/* Header (Optional Title) */}
         <div className="p-4 text-gray-500 text-sm border-b border-transparent">
           setting
