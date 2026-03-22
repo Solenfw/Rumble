@@ -1,106 +1,173 @@
-import { Link } from 'react-router-dom';
-
-// 1. Define the data interface
-interface VisualizationItem {
-  id: string;
-  title: string;
-  image: string;
-  link?: string; // Optional: where it goes when clicked
-}
-
-// 2. Mock Data (Matching your screenshot)
-const visualizations: VisualizationItem[] = [
-  {
-    id: '1',
-    title: 'Real estate prices',
-    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800',
-    link: '/globe',
-  },
-  {
-    id: '2',
-    title: 'Earth quakes',
-    image: 'https://img.freepik.com/free-vector/earthquake-concept-illustration_114360-1557.jpg?w=800', // Vector style match
-    link: '/globe',
-  },
-  {
-    id: '3',
-    title: 'Sample',
-    image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&q=80&w=800', // Tomato
-    link: '/globe',
-  },
-  {
-    id: '4',
-    title: 'Populations',
-    image: 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?auto=format&fit=crop&q=80&w=800', // Crowd/Abstract
-    link: '/globe',
-  },
-  {
-    id: '5',
-    title: 'Sample',
-    image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&q=80&w=800',
-    link: '/globe',
-  },
-  {
-    id: '6',
-    title: 'Sample',
-    image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&q=80&w=800',
-    link: '/globe',
-  },
-];
-
-// 3. Reusable Card Component
-const DashboardCard = ({ item }: { item: VisualizationItem }) => {
-  return (
-    <div 
-      className="group flex h-40 w-full cursor-pointer overflow-hidden rounded-md bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl border border-gray-100"
-    >
-      {/* Left Side: Image */}
-      <div className="w-2/5 overflow-hidden relative">
-        <img
-          src={item.image}
-          alt={item.title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
-        {/* Subtle overlay for better contrast if needed */}
-        <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
-      </div>
-
-      {/* Right Side: Content */}
-      <div className="flex w-3/5 items-center justify-center bg-zinc-50/50 p-4">
-        <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-          {item.title}
-        </h3>
-      </div>
-    </div>
-  );
-};
+import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Moon, Database, Save } from "lucide-react";
+import newsImg from "../assets/images/news.png";
 
 export default function Home() {
+  const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState("home");
+  type NewsItem = {
+    title: string;
+    image: string;
+  };
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [lastUpdated, setLastUpdated] = useState("");
+
+  //Update data, time
+  const updateNews = (newData: NewsItem[]) => {
+    setNews(newData);
+
+    const now = new Date().toLocaleString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    setLastUpdated(now);
+  };
+
+
+  useEffect(() => {
+    updateNews([
+      {
+        title:
+          "S&P downgrades Botswana as diamond sector faces global headwinds.",
+        image: newsImg,
+      },
+      {
+        title:
+          "Global markets react to unexpected economic shifts worldwide.",
+        image: newsImg,
+      },
+      {
+        title:
+          "Tech companies continue expansion despite global uncertainties.",
+        image: newsImg,
+      },
+    ]);
+  }, []);
+
   return (
-    <section className="w-full bg-white px-6 py-12 md:px-12 lg:px-24 min-h-screen">
-      <div className="mx-auto max-w-7xl">
+      <div className="h-screen bg-[#1f1f1f] text-black font-mono flex flex-col">      
+      {/* HEADER */}
+      <div className="flex justify-between items-center bg-[#cdd8c0] px-6 py-3 border-b border-gray-400">        
+        {/* LEFT */}
+        <div className="ml-15">
+          <Link
+            to="/"
+            className="bg-black text-white text-xl px-6 py-2 rounded-md font-bold 
+            shadow-[0_0_10px_rgba(0,0,0,0.5)] 
+            hover:shadow-[0_0_20px_rgba(0,0,0,0.8)] 
+            transition duration-300"
+          >
+            EXPLORE
+          </Link>
+        </div>
+
+        {/* RIGHT */}
+        <div className="flex items-center gap-4 relative">
+          <Moon className="w-8 h-8 cursor-pointer" />
+
+          <div
+            className="relative cursor-pointer"
+            onClick={() => setOpen(!open)}
+          >
+            <img
+              src="https://i.pravatar.cc/40"
+              alt="avatar"
+              className="w-10 h-10 rounded-full"
+            />
+
+            {open && (
+              <div className="absolute right-0 mt-3 w-44 bg-white rounded-md shadow-lg py-2 z-50">
+                <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  My Account
+                </p>
+                <hr />
+                <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  Setting
+                </p>
+                <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  Sign out
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* BODY */}
+      <div className="flex flex-1">
         
-        {/* Header Section */}
-        <div className="mb-10 border-b border-gray-200 pb-4">
-          <div className="flex items-baseline gap-4">
-            <h1 className="font-serif text-5xl text-black">
-              3D visualizations
-            </h1>
-            <span className="text-sm font-medium text-gray-500 font-sans">
-              {visualizations.length} items
-            </span>
+        {/* SIDEBAR */}
+        <div className="w-[100px] bg-[#b7c7a8] flex flex-col items-center py-4 space-y-4">
+          <div
+            onClick={() => setTab("home")}
+            className={`p-10 rounded-md cursor-pointer transition ${
+              tab === "home"
+                ? "bg-white"
+                : "bg-[#b7c7a8] hover:scale-105"
+            }`}
+          >
+            <Save className="w-7 h-7" />
+          </div>
+
+          <div
+            onClick={() => setTab("storage")}
+            className={`p-10 rounded-md cursor-pointer transition ${
+              tab === "storage"
+                ? "bg-white"
+                : "bg-[#b7c7a8] hover:scale-105"
+            }`}
+          >
+            <Database className="w-7 h-7" />
           </div>
         </div>
 
-        {/* Grid Section */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {visualizations.map((item) => (
-            <Link to={item.link || '#'} key={item.id} className="no-underline">
-                <DashboardCard key={item.id} item={item} />
-            </Link>
-          ))}
+        {/* MAIN */}
+        <div className="flex-1 bg-[#e5e5e5] p-6 overflow-y-auto">
+          
+          {/* HOME */}
+          {tab === "home" && (
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-5xl font-black mb-2 tracking-wide drop-shadow-md">Global News!</h1>
+
+              <p className="text-sm text-gray-600 mb-6 italic">
+                Last updated: {lastUpdated}
+              </p>
+
+              <div className="space-y-6">
+                {news.map((item, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-xl p-6 flex justify-between items-center 
+                    border-2 border-gray-400 hover:shadow-md transition"
+                  >
+                    <p className="flex-1 text-gray-800">{item.title}</p>
+
+                    <img
+                      src={item.image}
+                      alt="news"
+                      className="w-40 h-24 object-cover rounded-md"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* STORAGE */}
+          {tab === "storage" && (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-gray-500 text-lg">
+                No saved earthquake data yet!
+              </p>
+            </div>
+          )}
         </div>
       </div>
-    </section>
+    </div>
   );
 }
