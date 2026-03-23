@@ -7,9 +7,11 @@ export default function Landing() {
     <div className="min-h-screen bg-black text-white font-sans overflow-x-hidden">
       {/* Login Button in Top Right */}
       <div className="absolute top-8 right-8 z-20">
+        <Link to="/signin">
         <button className="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all duration-300 text-sm font-medium backdrop-blur-md">
           Login
         </button>
+        </Link>
       </div>
 
       {/* 1. Hero Section */}
