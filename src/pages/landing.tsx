@@ -87,7 +87,7 @@ export default function Landing() {
           <div className="w-64 h-px bg-white/30 mx-auto mt-16"></div>
         </div>
       </section>
-
+    
       {/* 3. Footer Section */}
       <footer className="bg-black pt-20 pb-12 px-6 md:px-12 lg:px-24 border-t border-white/5">
         <div className="max-w-7xl mx-auto">

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { handleGoogleSignIn } from '@services/authService';
 
 const SignUp: React.FC = () => {
   return (
@@ -91,6 +92,7 @@ const SignUp: React.FC = () => {
 
             {/* Google Sign Up Button */}
             <button
+              onClick={handleGoogleSignIn}
               type="button"
               className="w-full bg-transparent border-2 border-white hover:bg-white/10 text-white flex items-center justify-center space-x-3 h-16 rounded-xl transition-all"
             >

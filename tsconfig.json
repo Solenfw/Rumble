@@ -31,7 +31,9 @@
       "@utils/*": ["utils/*"],
       "@shaders/*": ["shaders/*"],
       "@services/*": ["services/*"],
-      "@types*": ["types/index.ts"]
+      "@types*": ["types/index.ts"],
+      "@contexts/*": ["contexts/*"],
+      "@pages/*": ["pages/*"]
     }
   },
   "include": ["src"],

@@ -1,9 +1,11 @@
 import { Route, Routes } from 'react-router-dom';
-import Globe from './components/Globe';
-import Home from './pages/Home';
-import Landing from './pages/Landing';
-import SignIn from './pages/SignIn';
-import SignUp from './pages/SignUp';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import Globe from '@components/Globe';
+import Home from '@pages/home';
+import Landing from '@pages/landing';
+import SignIn from '@pages/signIn';
+import SignUp from '@pages/signUp';
+import Settings from '@pages/settings';
 
 function App() {
   return (
@@ -11,8 +13,9 @@ function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/globe" element={<Globe />} />
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />  
+      <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/globe" element={<ProtectedRoute><Globe /></ProtectedRoute>} />
     </Routes>
   );
 }

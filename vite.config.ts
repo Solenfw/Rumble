@@ -35,6 +35,8 @@ export default defineConfig({
       '@shaders': path.resolve(__dirname, 'src/shaders/'),
       '@services': path.resolve(__dirname, 'src/services/'),
       '@types': path.resolve(__dirname, 'src/types/index.ts'),
+      '@contexts': path.resolve(__dirname, 'src/contexts/'),
+      '@pages': path.resolve(__dirname, 'src/pages/'),
     },
   },
 })
