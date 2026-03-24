@@ -15,7 +15,7 @@ const NewsItem = ({ title, image }: { title: string; image: string }) => (
 
 export default function Home() {
   const { user } = useAuth();
-  const avatarUrl = user?.user_metadata?.avatar_url || "https://i.pravatar.cc/40";
+  const avatarUrl = user?.user_metadata?.avatar_url || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
   const userName = user?.user_metadata?.full_name || "Your username";
 
   const [open, setOpen] = useState(false);
@@ -54,15 +54,22 @@ export default function Home() {
   return (
     <div className="h-screen bg-[#1f1f1f] text-black font-mono flex flex-col">
       {/* HEADER */}
-      <div className="flex justify-between items-center bg-[#cdd8c0] px-6 py-3 border-b border-gray-400">
+      <div className="flex justify-between relative items-center bg-[#cdd8c0] px-4 py-2 border-b border-gray-400">
         {/* LEFT */}
-        <div className="ml-15">
+        <div className="ml-0 items-center">
           <Link
             to="/globe"
-            className="bg-black text-white text-xl px-6 py-2 rounded-md font-bold shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(0,0,0,0.8)] transition duration-300"
+            className="inline-block bg-black text-white text-xl px-3 py-2 rounded-md font-bold shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(0,0,0,0.8)] transition duration-300"
           >
             EXPLORE
           </Link>
+          <div className="inline-block absolute left-1/2 -translate-x-1/2">
+            <p className="text-lg text-gray-1200 italic">
+              {user?.user_metadata?.about || (
+                <>Welcome back, <span className="font-bold">{userName}</span>!</>
+              )}
+            </p>
+          </div>
         </div>
 
         {/* RIGHT */}

@@ -1,12 +1,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@services/supabaseClient';
+import { AuthContextType } from '@types';
 
-interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  loading: boolean;
-}
 
 const AuthContext = createContext<AuthContextType>({
   user: null,

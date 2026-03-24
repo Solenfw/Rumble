@@ -2,6 +2,7 @@ import { Calendar, ChevronDown, Info, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InputBoxProps } from '@types';
+import { useAuth } from '@contexts/authContext';
 
 // --- Reusable Components ---
 const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, multiline }) => {
@@ -31,18 +32,19 @@ const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, multiline }
 
 // --- View Components ---
 
-const EditProfileView = ({ formData, handleInputChange }: any) => (
+const EditProfileView = ({ formData, handleInputChange, handleAvatarChange, fileInputRef, onChange }: any) => (
   <div className="max-w-md mx-auto">
     {/* Avatar Group */}
     <div className="flex items-center gap-4 mb-8">
       <div className="w-20 h-20 rounded-full overflow-hidden border border-gray-200 shrink-0">
         <img
-          src="https://i.pravatar.cc/40" 
+          src={formData.avatarUrl}
           alt="Your profile picture"
           className="w-full h-full object-cover"
         />
       </div>
-      <button className="bg-[#94a87d] text-black px-4 py-1 font-bold text-sm rounded shadow-sm hover:bg-[#83966c] transition-colors">
+      <input type="file" accept="image/*" ref={fileInputRef} onChange={onChange} className="hidden" />
+      <button onClick={handleAvatarChange} className="bg-[#94a87d] text-black px-4 py-1 font-bold text-sm rounded shadow-sm hover:bg-[#83966c] transition-colors">
         CHANGE
       </button>
     </div>
@@ -213,15 +215,37 @@ const PrivacyDataView = () => (
 // --- Main Settings Component ---
 
 const Settings: React.FC = () => {
+  const { user } = useAuth();
+  const avatarUrl = user?.user_metadata?.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
+  const userName = user?.user_metadata?.full_name || 'Your username';
+
   const navigate = useNavigate();
   const[activeMenu, setActiveMenu] = useState('Edit Profile');
   const [formData, setFormData] = useState({
-    username: '',
+    username: userName,
     about: '',
-    email: '',
+    avatarUrl: avatarUrl,
   });
 
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const menuItems =['Edit Profile', 'Account management', 'Privacy and Data'];
+
+  const handleAvatarChange = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({ ...prev, avatarUrl: reader.result as string }));
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [field]: e.target.value });
@@ -239,7 +263,14 @@ const Settings: React.FC = () => {
   const renderContent = () => {
     switch (activeMenu) {
       case 'Edit Profile':
-        return <EditProfileView formData={formData} handleInputChange={handleInputChange} />;
+        return <EditProfileView 
+                formData={formData} 
+                handleInputChange={handleInputChange} 
+                avatarUrl={avatarUrl} 
+                handleAvatarChange={handleAvatarChange}
+                fileInputRef={fileInputRef}
+                onChange={handleFileSelect}
+                />;
       case 'Account management':
         return <AccountManagementView />;
       case 'Privacy and Data':
@@ -251,11 +282,6 @@ const Settings: React.FC = () => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      {/* 
-        Changes made here:
-        1. Added `max-h-[90vh]` to prevent the modal from getting taller than the screen.
-        2. Changed `min-h-150` to `min-h-[600px]` (Valid Tailwind notation). 
-      */}
       <div className="bg-white w-full max-w-4xl rounded-sm shadow-2xl flex flex-col overflow-hidden max-h-[90vh] min-h-150">
         
         {/* Header - Added shrink-0 to prevent squishing */}
