@@ -17,3 +17,5 @@ export const handleSignOut = async () => {
     await supabase.auth.signOut();
     window.location.href = '/'; // Redirect to sign-in page after signing out
 };
+
+
