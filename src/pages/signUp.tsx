@@ -1,33 +1,102 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '@services/supabaseClient';
+import { useAuth } from '@contexts/authContext';
 import { handleGoogleSignIn } from '@services/authService';
 
 const SignUp: React.FC = () => {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+
+  // Already logged in — skip this page
+  useEffect(() => {
+    if (!authLoading && user) navigate('/home', { replace: true });
+  }, [user, authLoading, navigate]);
+
+  const handleSignUp = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
+    setLoading(true);
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/home`,
+      },
+    });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    // Success — Supabase sent a confirmation email
+    setEmailSent(true);
+    setLoading(false);
+  };
+
+  // Show confirmation screen after sign up
+  if (emailSent) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center p-4 font-mono"
+        style={{ background: 'linear-gradient(to bottom, #000000 0%, #666666 100%)' }}
+      >
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 rounded-full bg-[#4a6d7c] flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h2 className="text-white text-3xl font-bold mb-4">Check your email</h2>
+          <p className="text-gray-400 text-lg mb-8">
+            We sent a confirmation link to <span className="text-white font-semibold">{email}</span>.
+            Click it to activate your account.
+          </p>
+          <Link to="/signin" className="text-gray-400 hover:text-white transition-colors text-sm">
+            Back to sign in
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div 
+    <div
       className="min-h-screen flex items-center justify-center p-4 font-mono"
-      style={{
-        background: 'linear-gradient(to bottom, #000000 0%, #666666 100%)'
-      }}
+      style={{ background: 'linear-gradient(to bottom, #000000 0%, #666666 100%)' }}
     >
       <div className="w-full max-w-480 min-h-270 flex items-center justify-center">
         <div className="bg-transparent w-full max-w-xl p-8 md:p-12 flex flex-col items-center">
           <h1 className="text-white text-6xl font-bold mb-12 text-center">Sign up</h1>
-          
-          <form className="w-full space-y-6">
-            {/* Username Field */}
-            <div className="space-y-2">
-              <label className="text-white text-lg block" htmlFor="username">
-                Your username
-              </label>
-              <input
-                type="text"
-                id="username"
-                className="w-full bg-[#d9d9d9] text-black h-14 rounded-xl px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-              />
-            </div>
 
-            {/* Email Field */}
+          {/* Error message */}
+          {error && (
+            <div className="w-full mb-6 px-4 py-3 bg-red-900/40 border border-red-700/50 rounded-xl text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSignUp} className="w-full space-y-6">
             <div className="space-y-2">
               <label className="text-white text-lg block" htmlFor="email">
                 Your email
@@ -35,11 +104,13 @@ const SignUp: React.FC = () => {
               <input
                 type="email"
                 id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 className="w-full bg-[#d9d9d9] text-black h-14 rounded-xl px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               />
             </div>
 
-            {/* Password Field */}
             <div className="space-y-2">
               <label className="text-white text-lg block" htmlFor="password">
                 Password
@@ -47,11 +118,13 @@ const SignUp: React.FC = () => {
               <input
                 type="password"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
                 className="w-full bg-[#d9d9d9] text-black h-14 rounded-xl px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               />
             </div>
 
-            {/* Confirm Password Field */}
             <div className="space-y-2">
               <label className="text-white text-lg block" htmlFor="confirm-password">
                 Confirm password
@@ -59,15 +132,18 @@ const SignUp: React.FC = () => {
               <input
                 type="password"
                 id="confirm-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
                 className="w-full bg-[#d9d9d9] text-black h-14 rounded-xl px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               />
             </div>
 
-            {/* Terms Checkbox */}
             <div className="flex items-start space-x-3 pt-2">
               <input
                 type="checkbox"
                 id="terms"
+                required
                 className="mt-1 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
               />
               <label htmlFor="terms" className="text-white text-sm leading-tight">
@@ -75,49 +151,34 @@ const SignUp: React.FC = () => {
               </label>
             </div>
 
-            {/* Sign Up Button */}
             <button
               type="submit"
-              className="w-full bg-[#4a6d7c] hover:bg-[#5a7d8c] text-white text-2xl font-bold h-16 rounded-xl mt-4 transition-all transform active:scale-95 shadow-lg"
+              disabled={loading}
+              className="w-full bg-[#4a6d7c] hover:bg-[#5a7d8c] disabled:opacity-50 disabled:cursor-not-allowed text-white text-2xl font-bold h-16 rounded-xl mt-4 transition-all transform active:scale-95 shadow-lg"
             >
-              Sign up
+              {loading ? 'Creating account...' : 'Sign up'}
             </button>
 
-            {/* Divider */}
             <div className="flex items-center space-x-4 py-4">
               <div className="flex-1 h-px bg-gray-500"></div>
               <span className="text-white font-bold">Or</span>
               <div className="flex-1 h-px bg-gray-500"></div>
             </div>
 
-            {/* Google Sign Up Button */}
             <button
-              onClick={handleGoogleSignIn}
               type="button"
+              onClick={handleGoogleSignIn}
               className="w-full bg-transparent border-2 border-white hover:bg-white/10 text-white flex items-center justify-center space-x-3 h-16 rounded-xl transition-all"
             >
               <svg className="w-6 h-6" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
+                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
               <span className="text-xl">Sign up with Google</span>
             </button>
 
-            {/* Footer Text */}
             <div className="text-center pt-8 text-white text-lg">
               Already have an account?{' '}
               <Link to="/signin" className="font-bold hover:underline">

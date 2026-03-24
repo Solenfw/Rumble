@@ -6,6 +6,7 @@ import Landing from '@pages/landing';
 import SignIn from '@pages/signIn';
 import SignUp from '@pages/signUp';
 import Settings from '@pages/settings';
+import ForgotPassword from '@pages/forgotPassword';
 
 function App() {
   return (
@@ -13,6 +14,8 @@ function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+       {/* Protected routes */}
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />  
       <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
       <Route path="/globe" element={<ProtectedRoute><Globe /></ProtectedRoute>} />

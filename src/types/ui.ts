@@ -16,3 +16,10 @@ export interface OptionsPanelProps {
 export interface InfoPanelProps extends EarthquakeContextData {
   camera : THREE.Camera;
 }
+
+export interface InputBoxProps {
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  multiline?: boolean;
+}

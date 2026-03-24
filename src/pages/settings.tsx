@@ -1,16 +1,9 @@
 import { Calendar, ChevronDown, Info, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { InputBoxProps } from '@types';
 
 // --- Reusable Components ---
-
-interface InputBoxProps {
-  label: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  multiline?: boolean;
-}
-
 const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, multiline }) => {
   return (
     <div className="mb-6 border border-gray-300 rounded-xl p-4 transition-all focus-within:border-gray-500 focus-within:ring-1 focus-within:ring-gray-500">
