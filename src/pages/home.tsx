@@ -16,7 +16,7 @@ const NewsItem = ({ title, image }: { title: string; image: string }) => (
 export default function Home() {
   const { user } = useAuth();
   const avatarUrl = user?.user_metadata?.avatar_url || "https://i.pravatar.cc/40";
-  const userName = user?.user_metadata?.full_name || "User";
+  const userName = user?.user_metadata?.full_name || "Your username";
 
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("home");
@@ -81,8 +81,6 @@ export default function Home() {
             {open && (
               <div className="absolute right-0 mt-3 w-44 bg-white rounded-md shadow-lg py-2 z-50">
                 <p className="px-4 py-2 text-sm font-medium">{userName}</p>
-                <hr />
-                <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer">My Account</p>
                 <hr />
                 <Link to="/settings">
                   <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</p>

@@ -37,8 +37,8 @@ const EditProfileView = ({ formData, handleInputChange }: any) => (
     <div className="flex items-center gap-4 mb-8">
       <div className="w-20 h-20 rounded-full overflow-hidden border border-gray-200 shrink-0">
         <img
-          src="https://placekitten.com/200/200" // Placeholder cat image
-          alt="Avatar"
+          src="https://i.pravatar.cc/40" 
+          alt="Your profile picture"
           className="w-full h-full object-cover"
         />
       </div>
