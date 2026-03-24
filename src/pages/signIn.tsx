@@ -85,7 +85,7 @@ const SignIn: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#4a6d7c] hover:bg-[#5a7d8c] disabled:opacity-50 disabled:cursor-not-allowed text-white text-3xl font-bold h-16 rounded-xl mt-8 transition-all transform active:scale-95 shadow-lg"
+                className="w-full bg-[#4a6d7c] hover:cursor-pointer hover:bg-[#5a7d8c] disabled:opacity-50 disabled:cursor-not-allowed text-white text-3xl font-bold h-16 rounded-xl mt-8 transition-all transform active:scale-95 shadow-lg"
               >
                 {loading ? 'Signing in...' : 'Sign in'}
               </button>
@@ -102,7 +102,7 @@ const SignIn: React.FC = () => {
             <button
               type="button"
               onClick={handleGoogleSignIn}
-              className="w-full bg-transparent border-2 border-white hover:bg-white/10 text-white flex items-center justify-center space-x-3 h-16 rounded-xl transition-all"
+              className="w-full bg-transparent border-2 border-white hover:cursor-pointer hover:bg-white/10 text-white flex items-center justify-center space-x-3 h-16 rounded-xl transition-all"
             >
               <svg className="w-6 h-6" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

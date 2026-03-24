@@ -1,4 +1,4 @@
-import { Calendar, ChevronDown, Info, X } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InputBoxProps } from '@types';
@@ -65,153 +65,178 @@ const EditProfileView = ({ formData, handleInputChange, handleAvatarChange, file
   </div>
 );
 
-const AccountManagementView = () => (
-  <div className="max-w-md mx-auto font-sans text-gray-900 pb-8">
-    {/* Header */}
-    <div className="mb-10">
-      <h1 className="text-[28px] font-bold mb-2 tracking-tight">
-        Account management
-      </h1>
-      <p className="text-[15px] text-gray-800">
-        Make changes to your personal information or account type.
-      </p>
-    </div>
 
-    {/* Your account */}
-    <div className="mb-12">
-      <h2 className="text-lg font-bold mb-4">Your account</h2>
+const AccountManagementView = () => {
+  const { user } = useAuth();
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [pwError, setPwError] = useState('');
+  const [pwSuccess, setPwSuccess] = useState(false);
+  const [visible, setVisible] = useState(false);
 
-      {/* Email */}
-      <div className="mb-6">
-        <div className="border border-gray-400 rounded-2xl px-4 py-3 focus-within:ring-2 focus-within:ring-blue-300">
-          <label className="block text-xs text-gray-800 mb-1">
-            Email - Private
-          </label>
-          <input
-            type="email"
-            defaultValue="vincentcody0175@gmail.com"
-            className="w-full bg-transparent outline-none text-[15px]"
-            readOnly
-          />
-        </div>
-        <div className="mt-2 inline-flex items-center bg-[#b8f5d0] text-[#0a6c38] text-[13px] font-semibold px-2 py-1 rounded-md">
-          Confirmed
-        </div>
+  const handlePasswordChange = async () => {
+    setPwError('');
+    if (newPassword !== confirmPassword) return setPwError('Passwords do not match.');
+    if (newPassword.length < 6) return setPwError('Minimum 6 characters.');
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) return setPwError(error.message);
+    setPwSuccess(true);
+    setShowPasswordForm(false);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!confirm('Are you sure? This cannot be undone.')) return;
+    // requires server-side admin call — flag for later
+    console.warn('Account deletion requires server-side implementation.');
+  };
+
+  return (
+    <div className="max-w-md mx-auto font-sans text-gray-900 pb-8">
+      <div className="mb-10">
+        <h1 className="text-[28px] font-bold mb-2 tracking-tight">Account management</h1>
+        <p className="text-[15px] text-gray-800">Make changes to your personal information or account type.</p>
       </div>
 
-      {/* Password */}
-      <div className="flex items-center justify-between mb-4">
-        <span className="font-bold text-[15px]">Password</span>
-        <button className="bg-[#e9e9e9] hover:bg-[#d8d8d8] text-gray-900 font-semibold py-3 px-5 rounded-full text-[15px] transition-colors">
-          Change
-        </button>
-      </div>
-    </div>
-
-    {/* Personal information */}
-    <div className="mb-12">
-      <h2 className="text-lg font-bold mb-4">Personal information</h2>
-
-      {/* Birthdate */}
-      <div className="mb-6">
-        <div className="flex items-center gap-1 mb-2">
-          <span className="text-[13px] text-gray-800">Birthdate</span>
-          <Info className="w-4 h-4 text-gray-500" />
-        </div>
-        <div className="border border-gray-400 rounded-2xl px-4 py-3 flex justify-between items-center focus-within:ring-2 focus-within:ring-blue-300">
-          <input
-            type="text"
-            defaultValue="07/14/1999"
-            className="w-full bg-transparent outline-none text-[15px]"
-            readOnly
-          />
-          <Calendar className="w-5 h-5 text-gray-800 cursor-pointer" />
-        </div>
-      </div>
-
-      {/* Country/Region */}
-      <div className="mb-6">
-        <div className="border border-gray-400 rounded-2xl px-4 py-3 flex justify-between items-center focus-within:ring-2 focus-within:ring-blue-300">
-          <div className="w-full">
-            <label className="block text-xs text-gray-800 mb-1">
-              Country/Region
-            </label>
+      {/* Your account */}
+      <div className="mb-12">
+        <h2 className="text-lg font-bold mb-4">Your account</h2>
+        <div className="mb-6">
+          <div className="border border-gray-400 rounded-2xl px-4 py-3">
+            <label className="block text-xs text-gray-800 mb-1">Email - Private</label>
             <input
-              type="text"
-              defaultValue="United States"
+              type="email"
+              value={user?.email || ''}
               className="w-full bg-transparent outline-none text-[15px]"
               readOnly
             />
           </div>
-          <X className="w-5 h-5 text-gray-900 cursor-pointer hover:bg-gray-200 rounded-full p-0.5 transition-colors" />
-        </div>
-      </div>
-
-      {/* Language */}
-      <div className="mb-6">
-        <div className="border border-gray-400 rounded-2xl px-4 py-3 flex justify-between items-center focus-within:ring-2 focus-within:ring-blue-300">
-          <div className="w-full">
-            <label className="block text-xs text-gray-800 mb-1">Language</label>
-            <div className="relative">
-              <select className="w-full bg-transparent outline-none text-[15px] appearance-none cursor-pointer">
-                <option>English (US)</option>
-              </select>
-            </div>
+          <div className="mt-2 inline-flex items-center bg-[#b8f5d0] text-[#0a6c38] text-[13px] font-semibold px-2 py-1 rounded-md">
+            Confirmed
           </div>
-          <ChevronDown className="w-5 h-5 text-gray-900 pointer-events-none" />
+        </div>
+
+        {/* Password */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="font-bold text-[15px]">Password</span>
+            <button
+              onClick={() => setShowPasswordForm(!showPasswordForm)}
+              className="bg-[#e9e9e9] hover:bg-[#d8d8d8] text-gray-900 font-semibold py-3 px-5 rounded-full text-[15px] transition-colors"
+            >
+              {showPasswordForm ? 'Cancel' : 'Change'}
+            </button>
+          </div>
+          {showPasswordForm && (
+            <div className="space-y-3">
+              {pwError && <p className="text-red-500 text-sm">{pwError}</p>}
+              {pwSuccess && <p className="text-green-600 text-sm">Password updated successfully.</p>}
+              <div className="relative">
+                <input
+                  type= {visible? "text" : "password"}
+                  placeholder="New password"
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-300"
+                />
+                <button type="button" onClick={() => setVisible(!visible)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  {visible ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type= {visible? "text" : "password"}
+                  placeholder="Confirm password"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-300"
+                />
+                <button type="button" onClick={() => setVisible(!visible)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  {visible ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <button
+                onClick={handlePasswordChange}
+                className="w-full bg-[#4a6d7c] text-white font-semibold py-3 rounded-xl text-sm hover:bg-[#5a7d8c] transition-colors"
+              >
+                Update password
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Deactivation */}
+      <div>
+        <h2 className="text-lg font-bold mb-4">Deactivation</h2>
+        <div className="flex items-center justify-between gap-4 p-4 border border-red-200 rounded-xl">
+          <div>
+            <h3 className="font-bold text-[15px]">Delete your data and account</h3>
+            <p className="text-[13px] text-gray-500 mt-1">Permanently deletes everything associated with your account.</p>
+          </div>
+          <button
+            onClick={handleDeleteAccount}
+            className="bg-red-50 hover:bg-red-100 text-red-500 font-semibold py-3 px-5 rounded-full text-[14px] whitespace-nowrap transition-colors"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
+  );
+};
 
-    {/* Deactivation and deletion */}
-    <div>
-      <h2 className="text-lg font-bold mb-4">Deactivation and deletion</h2>
 
-      {/* Deactivate account */}
-      <div className="flex items-center justify-between mb-8 gap-4">
-        <div className="pr-2">
-          <h3 className="font-bold text-[15px]">Deactivate account</h3>
-          <p className="text-[15px] text-gray-800 mt-1 leading-snug">
-            Temporarily hide your profile, Pins and boards
-          </p>
-        </div>
-        <button className="bg-[#e9e9e9] hover:bg-[#d8d8d8] text-gray-900 font-semibold py-3 px-5 rounded-full text-[15px] whitespace-nowrap transition-colors">
-          Deactivate account
-        </button>
+const PrivacyDataView = () => {
+  const [analytics, setAnalytics] = useState(false);
+
+  return (
+    <div className="max-w-md mx-auto font-sans text-gray-900 p-4">
+      <div className="mb-10">
+        <h1 className="text-[28px] font-bold mb-2 tracking-tight">Privacy and Data</h1>
+        <p className="text-[15px] text-gray-800">Manage your privacy settings and data.</p>
       </div>
 
-      {/* Delete account */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="pr-2">
-          <h3 className="font-bold text-[15px]">Delete your data and account</h3>
-          <p className="text-[15px] text-gray-800 mt-1 leading-snug">
-            Permanently delete your data and everything associated with your account
-          </p>
+      {/* Data Collection */}
+      <div className="mb-8">
+        <h2 className="text-lg font-bold mb-4">Data Collection</h2>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
+            <div>
+              <p className="font-semibold text-sm">Analytics</p>
+              <p className="text-xs text-gray-500">Help us improve by sharing usage data</p>
+            </div>
+            <input type="checkbox" checked={analytics} onChange={() => setAnalytics(!analytics)} className="w-4 h-4 cursor-pointer" />
+          </div>
         </div>
-        <button className="bg-[#e9e9e9] hover:bg-[#d8d8d8] text-gray-900 font-semibold py-3 px-5 rounded-full text-[15px] whitespace-nowrap transition-colors">
-          Delete account
-        </button>
+      </div>
+
+      {/* What we collect */}
+      <div className="mb-8">
+        <h2 className="text-lg font-bold mb-4">What We Collect</h2>
+        <div className="p-4 bg-gray-50 rounded-xl space-y-2 text-sm text-gray-600">
+          <p>✓ Google account email and profile picture</p>
+          <p>✓ Saved earthquake data</p>
+          <p>✗ No location data</p>
+          <p>✗ No payment information</p>
+        </div>
+      </div>
+
+      {/* Download / Delete */}
+      <div>
+        <h2 className="text-lg font-bold mb-4">Your Data</h2>
+        <div className="space-y-3">
+          <button className="w-full text-left px-4 py-3 border border-gray-300 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors">
+            Download my data
+          </button>
+          <button className="w-full text-left px-4 py-3 border border-red-200 rounded-xl text-sm font-semibold text-red-500 hover:bg-red-50 transition-colors">
+            Delete all my data
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
-
-const PrivacyDataView = () => (
-  <div className="max-w-md mx-auto font-sans text-gray-900 p-4">
-    <div className="mb-10">
-      <h1 className="text-[28px] font-bold mb-2 tracking-tight">
-        Privacy and Data
-      </h1>
-      <p className="text-[15px] text-gray-800">
-        Manage your privacy settings and data.
-      </p>
-    </div>
-    <p>
-      We don't collect user data in any form. Our privacy policy only handles
-      your Google account information.
-    </p>
-  </div>
-);
+  );
+};
 
 // --- Main Settings Component ---
 
