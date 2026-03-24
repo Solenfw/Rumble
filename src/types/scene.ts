@@ -17,9 +17,9 @@ export interface PlanetConfig {
 
 // The controls object from Leva (used in Earth.tsx)
 export interface GlobeControls {
-  earthRotationSpeed: number;
-  cloudsRotationSpeed: number;
-  starsRotationSpeed: number;
+  RotationSpeed: number;
+  CloudSpeed: number;
+  StarsSpeed: number;
   sunDirection: [number, number, number]; // Array because Leva returns arrays
 }
 

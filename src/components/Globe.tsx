@@ -35,9 +35,9 @@ const Globe = () => {
   const [camera, setCamera] = useState<THREE.Camera | null>(null);
   
   const controls = useControls({
-    earthRotationSpeed: { value: 0.001, min: 0, max: 0.01 },
-    cloudsRotationSpeed: { value: 0.0005, min: 0, max: 0.01 },
-    starsRotationSpeed: { value: 0.0001, min: 0, max: 0.01 },
+    RotationSpeed: { value: 0.001, min: 0, max: 0.01 },
+    CloudSpeed: { value: 0.0005, min: 0, max: 0.01 },
+    StarsSpeed: { value: 0.0001, min: 0, max: 0.01 },
     sunDirection: { value: [-1.5, 1.5, 0.5] },
   });
   
