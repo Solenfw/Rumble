@@ -5,12 +5,14 @@ import { focusOnEarthquake } from '@utils/performRayCast';
 import { Tooltip } from './Tooltip';
 import { getMagnitudeStyle } from '@utils/colorScale';
 import { handleSaveEarthquake } from '@services/saveDetailService';
+import { useAuth } from '@contexts/authContext';
 
 export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: InfoPanelProps) => {
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [magByFilter, setMagByFilter] = useState('all');
     const [visible, setVisible] = useState(false);
     const [showToast, setShowToast] = useState(false);
+    const { user } = useAuth();
 
     const triggerToast = () => {
         setShowToast(true);
@@ -131,8 +133,9 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
                                     )}
                                     <div
                                         onClick={() => {
-                                            handleSaveEarthquake(eq.properties.detail);
-                                            triggerToast();
+                                            handleSaveEarthquake(eq.properties.detail, user?.id || '').then(() => {
+                                                triggerToast();
+                                            });
                                         }}
                                         className='hover:border-slate-700/50 hover:bg-slate-600/50 p-1 rounded-md transition-opacity opacity-0 group-hover:opacity-100'>
                                         <Save className="w-5 h-5 text-slate-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity" />
