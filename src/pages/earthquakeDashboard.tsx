@@ -10,8 +10,7 @@ import {
   Wifi
 } from 'lucide-react';
 
-// Assuming these are imported from your actual paths
-import {  getMagnitudeToColor, getMagnitudeLabel } from '@utils/colorScale';
+import {  getMagnitudeColor, getMagnitudeLabel } from '@utils/colorScale';
 import { EarthquakeDetailProps } from '@types';
 
 interface Props {
@@ -20,8 +19,8 @@ interface Props {
 
 const EarthquakeDashboard: React.FC<Props> = ({ data }) => {
   const { properties, geometry } = data;
-  
-  const magColorHex = `#${getMagnitudeToColor(properties.mag).toString(16).padStart(6, '0')}`;
+
+  const magColorHex = `#${getMagnitudeColor(properties.mag).toString(16).padStart(6, '0')}`;
   const magLabel = getMagnitudeLabel(properties.mag);
   
   const originData = properties.products?.origin?.[0]?.properties;

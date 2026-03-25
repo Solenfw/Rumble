@@ -38,3 +38,4 @@ export const useEarthquakes = () => {
     refresh: loadEarthquakes
   };
 };
+

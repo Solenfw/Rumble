@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '@services/supabaseClient';
 import { useAuth } from '@contexts/authContext';
-import { handleGoogleSignIn } from '@services/authService';
+import { handleGoogleSignIn, handleEmailSignIn } from '@services/authService';
 
 const SignIn: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
@@ -17,15 +16,13 @@ const SignIn: React.FC = () => {
     if (!authLoading && user) navigate('/home', { replace: true });
   }, [user, authLoading, navigate]);
 
-  const handleEmailSignIn = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleEmailSignInLocal = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      setError(error.message);
+    const result = await handleEmailSignIn(email, password);
+    if (result.error) {
+      setError(result.error);
       setLoading(false);
       return;
     }
@@ -48,7 +45,7 @@ const SignIn: React.FC = () => {
               </div>
             )}
 
-            <form onSubmit={handleEmailSignIn} className="space-y-8">
+            <form onSubmit={handleEmailSignInLocal} className="space-y-8">
               <div className="space-y-2">
                 <label className="text-gray-400 text-lg block" htmlFor="email">
                   Your email

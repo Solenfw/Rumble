@@ -4,11 +4,18 @@ import { useEffect, useMemo, useState } from 'react';
 import { focusOnEarthquake } from '@utils/performRayCast';
 import { Tooltip } from './Tooltip';
 import { getMagnitudeStyle } from '@utils/colorScale';
+import { handleSaveEarthquake } from '@services/saveDetailService';
 
 export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: InfoPanelProps) => {
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [magByFilter, setMagByFilter] = useState('all');
     const [visible, setVisible] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+
+    const triggerToast = () => {
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 500);
+    }
 
     useEffect(() => {
         if (loading) setVisible(true);
@@ -116,7 +123,18 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
                                             </span>
                                         </div>
                                     </div>
-                                    <div className='hover:border-slate-700/50 hover:bg-slate-600/50 p-1 rounded-md transition-opacity opacity-0 group-hover:opacity-100'>
+                                    {/* Show Toast */}
+                                    {showToast && (
+                                        <div className='center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50'>
+                                            Earthquake saved!
+                                        </div>
+                                    )}
+                                    <div
+                                        onClick={() => {
+                                            handleSaveEarthquake(eq.properties.detail);
+                                            triggerToast();
+                                        }}
+                                        className='hover:border-slate-700/50 hover:bg-slate-600/50 p-1 rounded-md transition-opacity opacity-0 group-hover:opacity-100'>
                                         <Save className="w-5 h-5 text-slate-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity" />
                                     </div>
                                 </div>

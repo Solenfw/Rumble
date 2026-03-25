@@ -4,6 +4,7 @@ import { Moon, Database, Save } from "lucide-react";
 import { handleSignOut } from "@services/authService";
 import { useAuth } from "@contexts/authContext";
 import { ELEMENTS } from "@constants";
+import { fetchSavedEarthquakes } from "@services/saveDetailService";
 
 // NewsItem component for rendering individual news (to be replaced with API data later)
 const NewsItem = ({ title, image }: { title: string; image: string }) => (
@@ -28,6 +29,10 @@ export default function Home() {
   const [news, setNews] = useState<NewsItemType[]>([]);
   const [lastUpdated, setLastUpdated] = useState("");
 
+  const [savedEarthquakes, setSavedEarthquakes] = useState<any[]>([]);
+  const [loadingSaved, setLoadingSaved] = useState(false);
+  const [errorSaved, setErrorSaved] = useState<string | null>(null);
+
   // Update news data and timestamp
   const updateNews = (newData: NewsItemType[]) => {
     setNews(newData);
@@ -50,6 +55,21 @@ export default function Home() {
       },
     ]);
   }, []);
+
+  useEffect(() => {
+    if (tab === "storage") {
+      setLoadingSaved(true);
+      fetchSavedEarthquakes()
+        .then((data) => {
+          setSavedEarthquakes(data || []);
+          setLoadingSaved(false);
+        })
+        .catch(() => {
+          setErrorSaved("Failed to load saved earthquakes");
+          setLoadingSaved(false);
+        });
+    }
+  }, [tab]);
 
   return (
     <div className="h-screen bg-[#1f1f1f] text-black font-mono flex flex-col">
@@ -132,8 +152,20 @@ export default function Home() {
 
           {/* STORAGE TAB */}
           {tab === "storage" && (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500 text-lg">No saved earthquake data yet!</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {loadingSaved && <p className="text-gray-500 text-lg">Loading saved earthquakes...</p>}
+              {errorSaved && <p className="text-red-500 text-lg">{errorSaved}</p>}
+              {!loadingSaved && !errorSaved && savedEarthquakes.length === 0 && (
+                <p className="text-gray-500 text-lg">No saved earthquake data yet!</p>
+              )}
+              {savedEarthquakes.map((eq) => (
+                <div key={eq.id} className="bg-white rounded-2xl shadow-md p-5 flex flex-col items-center border-2 border-gray-300 hover:shadow-lg transition cursor-pointer">
+                  <div className="text-3xl font-bold mb-2 text-blue-700">{eq.mag?.toFixed(1) ?? '–'}</div>
+                  <div className="text-sm font-semibold text-gray-800 mb-1 text-center">{eq.place}</div>
+                  <div className="text-xs text-gray-500 mb-2">{new Date(eq.time).toLocaleString()}</div>
+                  <div className="text-xs text-gray-400">{eq.id}</div>
+                </div>
+              ))}
             </div>
           )}
         </div>

@@ -12,6 +12,20 @@ export const handleGoogleSignIn = async () => {
     }
 };
 
+export const handleEmailSignIn = async (
+  email: string,
+  password: string
+): Promise<{ error?: string }> => {
+  try {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      return { error: error.message };
+    }
+    return {};
+  } catch (err: any) {
+    return { error: err.message || 'Unknown error' };
+  }
+};
 
 export const handleSignOut = async () => {
     await supabase.auth.signOut();
