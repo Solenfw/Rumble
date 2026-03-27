@@ -1,236 +1,104 @@
-# Collab - 3D Globe Visualization
+# 🌍 Global Earthquake Research Lab
 
-This project uses **Vite + React + TypeScript + Three.js** to create an interactive 3D globe visualization with real-time earthquake data.
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![Threejs](https://img.shields.io/badge/threejs-black?style=for-the-badge&logo=three.js&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Zustand](https://img.shields.io/badge/zustand-%2320232a.svg?style=for-the-badge&logo=react)
 
-## Tech Stack
+An interactive, 3D data visualization and RESTful web application that tracks and maps real-time global seismic activity. 
 
-- ⚛️ **React 18** - UI framework
-- 📘 **TypeScript** - Type-safe development
-- ⚡ **Vite** - Fast build tool and dev server
-- 🌍 **Three.js** - 3D graphics library
-- 🎨 **CSS3** - Styling
+This project transforms raw USGS (United States Geological Survey) telemetry into an immersive 3D experience, paired with a modern, high-performance dashboard for saving and analyzing geological events.
 
-## Prerequisites
+## ✨ Key Features
 
-Before you start, make sure you have these installed:
+- **Interactive 3D Globe:** Built with WebGL, Three.js, and React Three Fiber. Features custom shaders for day/night cycles, atmospheric glow, and interactive geographical data points.
+- **Real-Time Data Consumption:** Fetches live earthquake telemetry globally via the USGS REST API.
+- **Advanced Telemetry Dashboard:** Includes interactive epicenter maps (via OpenStreetMap) and dynamic visual gauges for Magnitude, Depth, and Significance.
+- **Global State Caching:** Utilizes `Zustand` to aggressively cache API payloads and database records, ensuring instant, zero-loading-screen page transitions.
+- **Authentication & Cloud Storage:** Secure user registration, authentication, and personal data storage powered by Supabase.
 
-1. **Node.js** (v18 or higher)
-   - Download from: https://nodejs.org/
-   - Choose the LTS version
-   - Verify installation:
+## 🏛️ RESTful Architecture
+
+This application was engineered to strictly follow **RESTful architectural constraints**:
+
+1. **Client-Server Separation:** A fully decoupled React SPA (Single Page Application) acting as the client, interacting with remote backend services.
+2. **Stateless Operations:** User sessions and database mutations are handled statelessly using JWTs (JSON Web Tokens) passed in standard HTTP `Authorization` headers.
+3. **Uniform Interface (CRUD):** The application relies entirely on standard HTTP verbs interacting with JSON payloads:
+   - `GET`: Fetching live data from USGS, querying the NewsAPI, and reading saved records from the database.
+   - `POST`: Writing new earthquake records to the Supabase database.
+   - `PATCH`: Updating user profiles and privacy settings.
+   - `DELETE`: Removing specific earthquake records from a user's cloud storage or deleting accounts.
+4. **PostgREST Backend:** The database layer uses Supabase, which utilizes PostgREST to automatically expose a fully compliant REST API directly from the PostgreSQL schema.
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React 18, TypeScript, Vite
+- **3D Engine:** Three.js, `@react-three/fiber`, `@react-three/drei`
+- **Styling:** Tailwind CSS v4, Lucide React (Icons)
+- **State Management:** Zustand, React Router DOM
+- **Backend/BaaS:** Supabase (PostgreSQL, GoTrue Auth, PostgREST)
+- **External APIs:** USGS Earthquake Hazards API, NewsAPI, OpenStreetMap
+
+## 🚀 Getting Started
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- A [Supabase](https://supabase.com/) account and project
+- A[NewsAPI](https://newsapi.org/) key (free)
+
+### Installation
+## Installation
+
+1. **Clone the repository**
 ```bash
-     node --version
-     npm --version
+   git clone https://github.com/yourusername/collab.git
+   cd collab
 ```
 
-2. **Git** (optional, but recommended)
-   - Download from: https://git-scm.com/
-
-3. **Code Editor**
-   - Recommended: [VS Code](https://code.visualstudio.com/) with TypeScript support
-
-## Setup Instructions
-
-### 1. Clone or Download the Project
-
-**Option A - With Git:**
+2. **Install dependencies**
 ```bash
-git clone <repository-url>
-cd collab
+   npm install
 ```
 
-**Option B - Without Git:**
-- Download the project ZIP file
-- Extract it to a folder
-- Navigate to the folder in your terminal
+3. **Configure environment variables**
 
-### 2. Install Dependencies
+   Create a `.env` file in the root directory:
+```env
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
+   VITE_NEWS_API_KEY=your_newsapi_key
+```
 
-In the project folder, run:
+4. **Start the development server**
 ```bash
-npm install
+   npm run dev
 ```
 
-This will install:
-- React & React DOM
-- TypeScript & type definitions
-- Vite (build tool)
-- Three.js (3D graphics)
-- ESLint (code linting)
-
-**Note:** This may take a few minutes the first time.
-
-### 3. Run the Development Server
-
-Start the local development server:
-```bash
-npm run dev
-```
-
-You should see output like:
-```
-  VITE v5.x.x  ready in xxx ms
-
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: use --host to expose
-```
-
-### 4. View the Project
-
-Open your browser and go to:
-```
-http://localhost:5173/
-```
-
-You should see the interactive 3D globe! 🌍
-
-### 5. Stop the Server
-
-To stop the development server, press `Ctrl + C` in the terminal.
-
-## Project Structure
-```
-collab/
-├── src/
-│   ├── assets/              # Images, textures, and data files
-│   │   ├── circle.png       # Sprite texture for particles
-│   │   ├── earth-uv-map.jpg # Earth texture map
-│   │   ├── rad-grad.png     # Radial gradient texture
-│   │   ├── geojson/         # Geographic data
-│   │   │   ├── countries.json
-│   │   │   └── ne_110m_land.json
-│   │   └── usgs_geojson_api.json  # Earthquake data
-│   ├── components/          # React components (.tsx)
-│   │   ├── Globe.tsx        # Main 3D globe component
-│   │   ├── Controls.tsx     # UI controls
-│   │   ├── InfoPanel.tsx    # Information display
-│   │   └── QuakeDetails.tsx # Earthquake details component
-│   ├── hooks/               # Custom React hooks & Three.js utilities
-│   │   ├── getLayer.ts      # Background layer generator
-│   │   ├── getStarField.ts  # Starfield background
-│   │   ├── getThreeGeoJSON.ts  # GeoJSON to Three.js converter
-│   │   └── useEarthquakes.ts   # Earthquake data hook
-│   ├── services/            # API services
-│   │   └── earthquakeAPI.ts # USGS earthquake API calls
-│   ├── utils/               # Utility functions
-│   │   ├── colorScale.ts    # Color mapping utilities
-│   │   └── earthquakeUtils.ts # Coordinate conversions
-│   ├── App.tsx              # Main app component
-│   ├── main.tsx             # Entry point
-│   ├── vite-env.d.ts        # Vite type definitions
-│   ├── App.css              # App styles
-│   └── index.css            # Global styles
-├── public/                  # Static files
-├── tsconfig.json            # TypeScript configuration
-├── tsconfig.node.json       # TypeScript config for Node files
-├── vite.config.ts           # Vite configuration
-├── eslint.config.js         # ESLint configuration
-├── package.json             # Dependencies and scripts
-└── README.md               # This file
-```
-
-## Available Scripts
-
-```bash
-npm run dev         # Start development server with hot reload
-npm run build       # Build for production (runs type-check first)
-npm run preview     # Preview production build locally
-npm run lint        # Run ESLint to check code quality
-npm run type-check  # Run TypeScript type checking without emitting files
-```
-
-## Features
-
-✨ **Interactive 3D Globe**
-- Realistic Earth visualization with texture mapping
-- Smooth camera controls (rotate, zoom, pan)
-- Starfield background
-
-🌋 **Real-time Earthquake Data**
-- Fetches live data from USGS API
-- Color-coded by magnitude
-- Interactive earthquake markers
-- Detailed information panels
-
-🎯 **Type-Safe Development**
-- Full TypeScript support
-- Autocomplete and IntelliSense
-- Catch errors during development
-
-⚡ **Fast Development**
-- Vite's lightning-fast HMR (Hot Module Replacement)
-- Instant feedback on code changes
-
-## Controls
-
-- **Left Mouse + Drag:** Rotate the globe
-- **Mouse Wheel:** Zoom in/out
-- **Right Mouse + Drag:** Pan the camera
-- **Click Earthquake Marker:** View details
-
-## Making Changes
-
-1. All source code is in the `src/` directory
-2. Main globe logic is in `src/components/Globe.tsx`
-3. Edit any `.tsx` or `.ts` file and save
-4. The browser will automatically reload with your changes
-5. TypeScript will warn you of any type errors in your editor
-
-## TypeScript Benefits
-
-This project uses TypeScript for:
-- **Type safety** - Catch errors before runtime
-- **Better IDE support** - Autocomplete for Three.js, React, and more
-- **Self-documenting code** - Types serve as inline documentation
-- **Easier refactoring** - Rename and restructure with confidence
-
-## Common Issues & Solutions
-
-### ❌ "npm is not recognized"
-**Solution:** Node.js is not installed or not in your PATH. Reinstall Node.js and restart your terminal.
-
-### ❌ Port 5173 is already in use
-**Solution:** Vite will automatically use the next available port (5174, 5175, etc.)
-
-### ❌ Module not found errors
-**Solution:** Delete `node_modules` folder and `package-lock.json`, then run:
-```bash
-npm install
-```
-
-### ❌ TypeScript errors
-**Solution:** Run type checking to see all errors:
-```bash
-npm run type-check
-```
-
-### ❌ Three.js type errors
-**Solution:** Make sure type definitions are installed:
-```bash
-npm install -D @types/three
-```
-
-## Resources & Documentation
-
-- **Three.js Docs:** https://threejs.org/docs/
-- **React Docs:** https://react.dev/
-- **TypeScript Docs:** https://www.typescriptlang.org/docs/
-- **Vite Docs:** https://vitejs.dev/
-- **USGS Earthquake API:** https://earthquake.usgs.gov/fdsnws/event/1/
-
-## Contributing
-
-1. Create a new branch for your feature
-2. Make your changes
-3. Run `npm run type-check` to ensure no TypeScript errors
-4. Run `npm run lint` to check code quality
-5. Test your changes with `npm run dev`
-6. Submit a pull request
-
-## License
-
-[Add your license here]
+   The application will be available at `http://localhost:5173`.
 
 ---
 
-Built with ❤️ using React, TypeScript, and Three.js
+## Project Structure
+```
+src/
+├── components/       # Reusable UI & 3D Canvas components (Globe, Earth, Markers)
+├── constants/        # Global constants, asset URLs, and API route definitions
+├── contexts/         # React Context providers (AuthContext)
+├── hooks/            # Custom React hooks & Three.js utilities
+├── pages/            # Top-level route components (Dashboard, Settings, Auth)
+├── services/         # REST API wrapper functions (Supabase, USGS)
+├── shaders/          # Custom GLSL shaders for WebGL rendering
+├── store/            # Zustand global state management
+├── styles/           # Global CSS and Tailwind configurations
+├── types/            # TypeScript interfaces and definitions
+└── utils/            # Helper functions (color scaling, raycasting, math)
+```
+
+---
+
+## Acknowledgments
+
+- [USGS Earthquake Hazards Program](https://earthquake.usgs.gov/) — real-time earthquake REST API
+- [NewsAPI](https://newsapi.org/) — live science and geological news aggregation
+- [OpenStreetMap](https://www.openstreetmap.org/) — open-source mapping
