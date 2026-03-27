@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { NewsItemType, EarthquakeFeature, TimeRangeType, MagnitudeThresholdType } from '@types';
-import { fetchSavedEarthquakes } from '@services/saveDetailService';
+import { fetchSavedEarthquakes } from '@services/detailService';
 
 interface AppState {
   // --- News Cache ---
@@ -13,6 +13,8 @@ interface AppState {
   savedLoaded: boolean;
   fetchSaved: () => Promise<void>;
   addSavedEarthquake: (eq: any) => void;
+  clearSavedEarthquakes: () => void;
+  removeSavedEarthquake: (id: string) => void;
 
   // --- Globe Cache ---
   globeEarthquakes: EarthquakeFeature[];
@@ -49,6 +51,11 @@ export const useAppStore = create<AppState>((set, get) => ({
     savedEarthquakes: [...state.savedEarthquakes, eq] 
   })),
 
+  clearSavedEarthquakes: () => set({ savedEarthquakes:[] }),
+  removeSavedEarthquake: (id) => set((state) => ({ 
+    savedEarthquakes: state.savedEarthquakes.filter((eq) => eq.id !== id) 
+  })),
+
   // Globe
   globeEarthquakes:[],
   globeLastUpdated: null,
@@ -57,3 +64,4 @@ export const useAppStore = create<AppState>((set, get) => ({
   setGlobeEarthquakes: (globeEarthquakes, globeLastUpdated, lastTimeRange, lastMagThreshold) => 
     set({ globeEarthquakes, globeLastUpdated, lastTimeRange, lastMagThreshold }),
 }));
+

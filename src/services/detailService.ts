@@ -64,6 +64,24 @@ export const handleSaveEarthquake = async (detailUrl: string, currentUserId: str
     }
 };
 
+export const deleteSavedEarthquake = async (eqId: string, userId: string) => {
+    try {
+        const { error } = await supabase
+            .from("earthquakes")
+            .delete()
+            .match({ id: eqId, user_id: userId });
+
+        if (error) {
+            console.error("Error deleting earthquake:", error);
+            return { success: false, error };
+        }
+        return { success: true };
+    } catch (err) {
+        console.error("Error in deleteSavedEarthquake:", err);
+        return { success: false, error: err };
+    }
+};
+
 
 // Utility to fetch all saved earthquakes
 export const fetchSavedEarthquakes = async () => {

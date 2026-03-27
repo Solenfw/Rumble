@@ -1,10 +1,11 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Database, Save, LogOut, Settings } from "lucide-react";
+import { Database, Save, LogOut, Settings, Trash2 } from "lucide-react";
 import { handleSignOut } from "@services/authService";
 import { useAuth } from "@contexts/authContext";
 import { NewsItemType } from "@types";
 import { useAppStore } from "@store/useAppStore";
+import { deleteSavedEarthquake } from "@services/detailService";
 
 const NewsItem = ({ title, image, url }: NewsItemType) => {
   // Use a proxy to bypass the CORP/CORS block
@@ -55,8 +56,25 @@ export default function Home() {
     setNews, 
     savedEarthquakes, 
     savedLoaded, 
-    fetchSaved 
+    fetchSaved,
+    removeSavedEarthquake
   } = useAppStore();
+
+  const handleDelete = async (e: React.MouseEvent, eqId: string) => {
+    e.preventDefault(); 
+    e.stopPropagation();
+
+    if (!user?.id) return;
+    if (!window.confirm("Remove this earthquake from your storage?")) return;
+
+    const res = await deleteSavedEarthquake(eqId, user.id);
+    
+    if (res.success) {
+      removeSavedEarthquake(eqId); 
+    } else {
+      alert("Failed to delete the earthquake. Please try again.");
+    }
+  };
 
   // News Fetching Logic (Only fetches if cache is empty)
   useEffect(() => {
@@ -129,10 +147,20 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {loadingStorage ? <p>Loading...</p> : savedEarthquakes.map(eq => (
-                <Link key={eq.id} to={`/earthquake/${eq.id}`} className="bg-white p-5 rounded-2xl border hover:shadow-lg transition">
-                  <div className="text-3xl font-bold text-blue-700">{eq.mag?.toFixed(1)}</div>
-                  <p className="font-semibold truncate">{eq.place}</p>
-                </Link>
+                <div key={eq.id} className="relative group bg-white rounded-2xl border hover:shadow-lg transition">
+                  <Link to={`/earthquake/${eq.id}`} className="block p-5">
+                    <div className="text-3xl font-bold text-blue-700">{eq.mag?.toFixed(1)}</div>
+                    <p className="font-semibold truncate pr-8">{eq.place}</p>
+                  </Link>
+                  
+                  <button
+                    onClick={(e) => handleDelete(e, eq.id)}
+                    className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all cursor-pointer bg-white hover:bg-red-50 rounded-full"
+                    title="Remove from storage"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               ))}
             </div>
           )}

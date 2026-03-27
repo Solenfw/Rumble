@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { focusOnEarthquake } from '@utils/performRayCast';
 import { Tooltip } from './Tooltip';
 import { getMagnitudeStyle } from '@utils/colorScale';
-import { handleSaveEarthquake } from '@services/saveDetailService';
+import { handleSaveEarthquake } from '@services/detailService';
 import { useAuth } from '@contexts/authContext';
 import { useAppStore } from '@store/useAppStore';
 
