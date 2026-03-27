@@ -36,6 +36,7 @@ export default defineConfig({
       '@types': path.resolve(__dirname, 'src/types/index.ts'),
       '@contexts': path.resolve(__dirname, 'src/contexts/'),
       '@pages': path.resolve(__dirname, 'src/pages/'),
+      '@store': path.resolve(__dirname, 'src/store/'),
     },
   },
 })

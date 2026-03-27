@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@services/supabaseClient';
 import { useAuth } from '@contexts/authContext';
 import { handleGoogleSignIn } from '@services/authService';
+import { ArrowLeft } from 'lucide-react';
 
 const SignUp: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
@@ -85,6 +86,10 @@ const SignUp: React.FC = () => {
       className="min-h-screen flex items-center justify-center p-4 font-mono"
       style={{ background: 'linear-gradient(to bottom, #000000 0%, #666666 100%)' }}
     >
+      <Link to="/" className="absolute top-8 left-8 text-gray-500 hover:text-white flex items-center gap-2 transition-colors">
+        <ArrowLeft className="w-5 h-5" /> Back to Landing
+      </Link>
+
       <div className="w-full max-w-480 min-h-270 flex items-center justify-center">
         <div className="bg-transparent w-full max-w-xl p-8 md:p-12 flex flex-col items-center">
           <h1 className="text-white text-6xl font-bold mb-12 text-center">Sign up</h1>

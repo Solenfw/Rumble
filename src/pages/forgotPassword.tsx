@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@services/supabaseClient';
+import { ArrowLeft } from 'lucide-react';
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -29,6 +30,10 @@ const ForgotPassword: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4 font-mono">
+      <Link to="/" className="absolute top-8 left-8 text-gray-500 hover:text-white flex items-center gap-2 transition-colors">
+        <ArrowLeft className="w-5 h-5" /> Back to Landing
+      </Link>
+
       <div className="w-full max-w-md">
         <h1 className="text-white text-4xl font-bold mb-4">Reset password</h1>
         <p className="text-gray-400 mb-10">

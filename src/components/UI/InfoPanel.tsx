@@ -6,13 +6,17 @@ import { Tooltip } from './Tooltip';
 import { getMagnitudeStyle } from '@utils/colorScale';
 import { handleSaveEarthquake } from '@services/saveDetailService';
 import { useAuth } from '@contexts/authContext';
+import { useAppStore } from '@store/useAppStore';
 
 export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: InfoPanelProps) => {
-    const [isPanelOpen, setIsPanelOpen] = useState(false);
-    const [magByFilter, setMagByFilter] = useState('all');
+    const[isPanelOpen, setIsPanelOpen] = useState(false);
+    const[magByFilter, setMagByFilter] = useState('all');
     const [visible, setVisible] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const { user } = useAuth();
+    
+    // Import the function to update global storage cache directly
+    const { addSavedEarthquake } = useAppStore();
 
     const triggerToast = (message: string) => {
         setToastMessage(message);
@@ -46,7 +50,7 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
             {/* Toggle Button */}
             <button
                 onClick={() => setIsPanelOpen(!isPanelOpen)}
-                className="absolute -right-12 top-125 bg-linear-to-br from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 text-slate-100 p-3 rounded-r-xl border border-l-0 border-slate-600/40 transition-all duration-300 hover:shadow-[0_0_20px_rgba(148,163,184,0.3)] hover:translate-x-1 group"
+                className="absolute -right-12 top-125 bg-linear-to-br from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 text-slate-100 p-3 rounded-r-xl border border-l-0 border-slate-600/40 transition-all duration-300 hover:shadow-[0_0_20px_rgba(148,163,184,0.3)] hover:translate-x-1 cursor-pointer group"
                 aria-label={isPanelOpen ? 'Close panel' : 'Open panel'}
             >
                 {isPanelOpen ? (
@@ -84,7 +88,7 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
             {/* Filter */}
             {visible && (
                 <select
-                    className="m-5 mx-6 mb-4 px-3 py-2 bg-slate-900/50 text-slate-300 rounded-md border border-slate-700/30 text-sm focus:ring-2 focus:ring-slate-500 focus:outline-none"
+                    className="m-5 mx-6 mb-4 px-3 py-2 bg-slate-900/50 text-slate-300 rounded-md border border-slate-700/30 text-sm focus:ring-2 focus:ring-slate-500 focus:outline-none cursor-pointer"
                     value={magByFilter}
                     onChange={(e) => setMagByFilter(e.target.value)}
                 >
@@ -98,7 +102,7 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
             )}
 
             {/* Earthquake List */}
-            <ul className="flex-1 min-h-0 overflow-y-auto px-3 py-2 space-y-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
+            <ul className="flex-1 min-h-0 overflow-y-auto px-3 py-2 space-y-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-700[&::-webkit-scrollbar-thumb]:rounded-full">
                 {filteredEarthquakes.map((eq) => {
                     const { mag, place, time, magType } = eq.properties;
 
@@ -130,10 +134,15 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
                                     <div
                                         onClick={() => {
                                             handleSaveEarthquake(eq.properties.detail, user?.id || '').then((result) => {
-                                                if (result.success && result.message !== 'Earthquake saved successfully') {
-                                                    triggerToast('Already saved! Choose another one.');
-                                                } else {
-                                                    triggerToast('Earthquake saved!');
+                                                if (result.success) {
+                                                    if (result.message !== 'Earthquake saved successfully') {
+                                                        triggerToast('Already saved! Choose another one.');
+                                                    } else {
+                                                        triggerToast('Earthquake saved!');
+                                                        // Push the new record safely to global cache
+                                                        const newRecord = Array.isArray(result.data) ? result.data[0] : result.data;
+                                                        if (newRecord) addSavedEarthquake(newRecord);
+                                                    }
                                                 }
                                             });
                                         }}

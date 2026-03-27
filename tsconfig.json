@@ -32,7 +32,8 @@
       "@services/*": ["services/*"],
       "@types*": ["types/index.ts"],
       "@contexts/*": ["contexts/*"],
-      "@pages/*": ["pages/*"]
+      "@pages/*": ["pages/*"],
+      "@store/*": ["store/*"]
     }
   },
   "include": ["src"],

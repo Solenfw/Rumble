@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Database, Save, LogOut, Settings } from "lucide-react";
 import { handleSignOut } from "@services/authService";
 import { useAuth } from "@contexts/authContext";
 import { NewsItemType } from "@types";
-import { fetchSavedEarthquakes } from "@services/saveDetailService";
+import { useAppStore } from "@store/useAppStore";
 
 const NewsItem = ({ title, image, url }: NewsItemType) => {
   // Use a proxy to bypass the CORP/CORS block
@@ -41,55 +41,57 @@ const UserDropdown = ({ name }: { name: string; onClose: () => void }) => (
 
 export default function Home() {
   const { user } = useAuth();
-  const [tab, setTab] = useState<"home" | "storage">("home");
   const [open, setOpen] = useState(false);
-  
-  const [news, setNews] = useState<NewsItemType[]>([]);
-  const [lastUpdated, setLastUpdated] = useState("");
-  
-  const [saved, setSaved] = useState<any[]>([]);
-  const [savedLoaded, setSavedLoaded] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loadingStorage, setLoadingStorage] = useState(false);
 
+  // Use URL Search Params for Tab Navigation
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get("tab") || "home";
 
+  // Pull cached data and functions from Zustand
+  const { 
+    news, 
+    newsLastUpdated, 
+    setNews, 
+    savedEarthquakes, 
+    savedLoaded, 
+    fetchSaved 
+  } = useAppStore();
+
+  // News Fetching Logic (Only fetches if cache is empty)
   useEffect(() => {
-  const fetchNews = async () => {
-    try {
-      const apiKey = import.meta.env.VITE_NEWS_API_KEY;
-      if (!apiKey) throw new Error("Missing API Key");
+    const fetchNews = async () => {
+      if (news.length > 0) return; // Skip if already loaded in store
+      
+      try {
+        const apiKey = import.meta.env.VITE_NEWS_API_KEY;
+        if (!apiKey) throw new Error("Missing API Key");
 
-      const res = await fetch(`https://newsapi.org/v2/everything?q=science&apiKey=${apiKey}`);
-      const data = await res.json();
+        const res = await fetch(`https://newsapi.org/v2/everything?q=science&apiKey=${apiKey}`);
+        const data = await res.json();
 
-      if (data.status === "ok" && Array.isArray(data.articles)) {
-        setNews(data.articles.map((a: any) => ({ 
-          title: a.title, 
-          image: a.urlToImage || "https://placehold.co/400x200?text=No+Image",
-          url: a.url 
-        })));
-        setLastUpdated(new Date().toLocaleTimeString());
-      } else {
-        console.error("API Error:", data.message || "Unknown error");
-        // Optional: set a UI error state here
+        if (data.status === "ok" && Array.isArray(data.articles)) {
+          const formattedNews = data.articles.map((a: any) => ({ 
+            title: a.title, 
+            image: a.urlToImage || "https://placehold.co/400x200?text=No+Image",
+            url: a.url 
+          }));
+          setNews(formattedNews, new Date().toLocaleTimeString());
+        }
+      } catch (e) {
+        console.error("Fetch failed:", e);
       }
-    } catch (e) {
-      console.error("Fetch failed:", e);
-    }
-  };
-  fetchNews();
-}, []);
+    };
+    fetchNews();
+  }, [news.length, setNews]);
 
+  // Storage Fetching Logic (Only fetches if not already loaded)
   useEffect(() => {
     if (tab === "storage" && !savedLoaded) {
-      setLoading(true);
-      fetchSavedEarthquakes()
-        .then((data) => {
-          setSaved(data);
-          setSavedLoaded(true);
-        })
-        .finally(() => setLoading(false));
+      setLoadingStorage(true);
+      fetchSaved().finally(() => setLoadingStorage(false));
     }
-  }, [tab, savedLoaded]);
+  }, [tab, savedLoaded, fetchSaved]);
 
   return (
     <div className="h-screen bg-[#1f1f1f] text-black font-mono flex flex-col">
@@ -97,16 +99,20 @@ export default function Home() {
       <header className="flex justify-between items-center bg-[#cdd8c0] px-6 py-3 border-b border-gray-400">
         <Link to="/globe" className="bg-black text-white px-4 py-2 rounded-md font-bold hover:shadow-lg transition">EXPLORE</Link>
         <div className="relative" onClick={() => setOpen(!open)}>
-          <img src={user?.user_metadata?.avatar_url || "/default-avatar.png"} className="w-10 h-10 rounded-full cursor-pointer border-2 border-white" />
+          <img src={user?.user_metadata?.avatar_url || "/default-avatar.png"} alt="User Avatar" className="w-10 h-10 rounded-full cursor-pointer border-2 border-white" />
           {open && <UserDropdown name={user?.user_metadata?.full_name || "User"} onClose={() => setOpen(false)} />}
         </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
+        {/* Sidebar Nav using Search Params */}
         <nav className="w-20 bg-[#b7c7a8] flex flex-col items-center py-6 gap-4">
           {[ { id: "home", icon: Save }, { id: "storage", icon: Database } ].map(({ id, icon: Icon }) => (
-            <button key={id} onClick={() => setTab(id as any)} className={`p-4 rounded-xl transition ${tab === id ? "bg-white shadow-md" : "hover:bg-[#a6b697]"}`}>
+            <button 
+              key={id} 
+              onClick={() => setSearchParams({ tab: id })} 
+              className={`p-4 rounded-xl cursor-pointer transition ${tab === id ? "bg-white shadow-md" : "hover:bg-[#a6b697]"}`}
+            >
               <Icon className="w-6 h-6" />
             </button>
           ))}
@@ -117,12 +123,12 @@ export default function Home() {
           {tab === "home" ? (
             <div className="max-w-4xl mx-auto space-y-6">
               <h1 className="text-4xl font-black">Global Science News</h1>
-              <p className="text-sm italic text-gray-500">Last updated: {lastUpdated}</p>
+              <p className="text-sm italic text-gray-500">Last updated: {newsLastUpdated}</p>
               {news.map((item, i) => <NewsItem key={i} {...item} />)}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {loading ? <p>Loading...</p> : saved.map(eq => (
+              {loadingStorage ? <p>Loading...</p> : savedEarthquakes.map(eq => (
                 <Link key={eq.id} to={`/earthquake/${eq.id}`} className="bg-white p-5 rounded-2xl border hover:shadow-lg transition">
                   <div className="text-3xl font-bold text-blue-700">{eq.mag?.toFixed(1)}</div>
                   <p className="font-semibold truncate">{eq.place}</p>
@@ -130,7 +136,8 @@ export default function Home() {
               ))}
             </div>
           )}
-          {tab === "storage" && !loading && saved.length === 0 && (
+          
+          {tab === "storage" && !loadingStorage && savedEarthquakes.length === 0 && (
             <div className="text-center text-gray-500 mt-20">
               <p className="text-xl">No saved earthquakes yet.</p>
               <p className="text-sm mt-2">Explore the globe and save earthquakes to see them here.</p>

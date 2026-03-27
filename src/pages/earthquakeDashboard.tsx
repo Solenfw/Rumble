@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { 
   Activity, 
   MapPin, 
@@ -8,13 +8,15 @@ import {
   Waves, 
   ExternalLink, 
   Globe, 
-  Wifi
+  Wifi,
+  ArrowLeft
 } from 'lucide-react';
 import {  getMagnitudeColor, getMagnitudeLabel } from '@utils/colorScale';
 import { EarthquakeDetailProps } from '@types';
 
 
 const EarthquakeDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [data, setData] = useState<EarthquakeDetailProps | null>(null);
   const [loading, setLoading] = useState(true);
@@ -84,6 +86,14 @@ const EarthquakeDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800">
       <div className="max-w-6xl mx-auto space-y-6">
+        
+        <button 
+          onClick={() => navigate(-1)} 
+          className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors font-semibold px-2"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Back to Dashboard
+        </button>
         
         {/* Header / Hero Section */}
         <div className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
