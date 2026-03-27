@@ -89,7 +89,7 @@ const EarthquakeDashboard: React.FC = () => {
         
         <button 
           onClick={() => navigate(-1)} 
-          className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors font-semibold px-2"
+          className="flex cursor-pointer items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors font-semibold px-2"
         >
           <ArrowLeft className="w-5 h-5" />
           Back to Dashboard

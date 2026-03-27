@@ -1,3 +1,4 @@
+// src/services/saveDetailService.ts
 import { supabase } from "./supabaseClient";
 import { fetchEarthquakeDetails } from "./earthquakeAPI";
 import { EarthquakeDetailProps } from "@types";
@@ -6,26 +7,22 @@ export const handleSaveEarthquake = async (detailUrl: string, currentUserId: str
     try {
         const earthquake: EarthquakeDetailProps = await fetchEarthquakeDetails(detailUrl);
         
-        // check if earthquake already exists in the database
         const { data: existing, error: fetchError } = await supabase
             .from("earthquakes")
-            .select("id, user_id")
+            .select("*") 
             .eq("id", earthquake.id)
             .single();
+
         if (existing && existing.user_id !== currentUserId) {
-            return {success: true, data : existing, message: "Earthquake saved successfully"};
+            return { success: true, data: existing, message: "Earthquake saved successfully" };
         }
         if (fetchError && fetchError.code !== "PGRST116") {
-            console.error("Error checking existing earthquake:", fetchError);
             return { success: false, message: "Failed to check existing earthquake", error: fetchError };
         }
         if (existing) {
-            console.log("Earthquake already exists in the database:", existing);
             return { success: true, data: existing, message: "Earthquake already saved" };
         }
 
-
-        // Prepare the data to match Supabase table schema
         const insertData = {
             id:         earthquake.id,
             user_id:    currentUserId,
@@ -42,19 +39,21 @@ export const handleSaveEarthquake = async (detailUrl: string, currentUserId: str
             cdi:        earthquake.properties.cdi,
             mmi:        earthquake.properties.mmi,
             url:        earthquake.properties.url,
-
-            long:  earthquake.geometry.coordinates[0],
-            lat:   earthquake.geometry.coordinates[1],
+            long:       earthquake.geometry.coordinates[0],
+            lat:        earthquake.geometry.coordinates[1],
             depth:      earthquake.geometry.coordinates[2],
-
             raw:        earthquake,  
         };
+
         const { data, error } = await supabase
             .from("earthquakes")
-            .insert([insertData]);
+            .insert([insertData])
+            .select()
+            .single(); 
+
         if (error) {
             console.error("Error saving earthquake:", error);
-            return { success: false, message : "Failed to save earthquake", error };
+            return { success: false, message: "Failed to save earthquake", error };
         } else {
             console.log("Earthquake saved successfully:", data);
             return { success: true, data, message: "Earthquake saved successfully" };
@@ -64,6 +63,7 @@ export const handleSaveEarthquake = async (detailUrl: string, currentUserId: str
         return { success: false, error: err };
     }
 };
+
 
 // Utility to fetch all saved earthquakes
 export const fetchSavedEarthquakes = async () => {

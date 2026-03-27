@@ -139,10 +139,13 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
                                                         triggerToast('Already saved! Choose another one.');
                                                     } else {
                                                         triggerToast('Earthquake saved!');
-                                                        // Push the new record safely to global cache
-                                                        const newRecord = Array.isArray(result.data) ? result.data[0] : result.data;
-                                                        if (newRecord) addSavedEarthquake(newRecord);
+                                                    
+                                                        if (result.data) {
+                                                            addSavedEarthquake(result.data);
+                                                        }
                                                     }
+                                                } else {
+                                                    triggerToast('Error saving earthquake.');
                                                 }
                                             });
                                         }}
