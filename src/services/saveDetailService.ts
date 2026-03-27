@@ -9,12 +9,15 @@ export const handleSaveEarthquake = async (detailUrl: string, currentUserId: str
         // check if earthquake already exists in the database
         const { data: existing, error: fetchError } = await supabase
             .from("earthquakes")
-            .select("id")
+            .select("id, user_id")
             .eq("id", earthquake.id)
             .single();
+        if (existing && existing.user_id !== currentUserId) {
+            return {success: true, data : existing, message: "Earthquake saved successfully"};
+        }
         if (fetchError && fetchError.code !== "PGRST116") {
             console.error("Error checking existing earthquake:", fetchError);
-            return { success: false, error: fetchError };
+            return { success: false, message: "Failed to check existing earthquake", error: fetchError };
         }
         if (existing) {
             console.log("Earthquake already exists in the database:", existing);
@@ -51,10 +54,10 @@ export const handleSaveEarthquake = async (detailUrl: string, currentUserId: str
             .insert([insertData]);
         if (error) {
             console.error("Error saving earthquake:", error);
-            return { success: false, error };
+            return { success: false, message : "Failed to save earthquake", error };
         } else {
             console.log("Earthquake saved successfully:", data);
-            return { success: true, data };
+            return { success: true, data, message: "Earthquake saved successfully" };
         }
     } catch (err) {
         console.error("Error in handleSaveEarthquake:", err);

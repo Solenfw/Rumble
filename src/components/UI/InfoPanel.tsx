@@ -11,13 +11,13 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [magByFilter, setMagByFilter] = useState('all');
     const [visible, setVisible] = useState(false);
-    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
     const { user } = useAuth();
 
-    const triggerToast = () => {
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 500);
-    }
+    const triggerToast = (message: string) => {
+        setToastMessage(message);
+        setTimeout(() => setToastMessage(''), 2000);
+    };
 
     useEffect(() => {
         if (loading) setVisible(true);
@@ -38,7 +38,7 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
     }, [earthquakes, magByFilter]);
 
     return (
-        <div 
+        <div
             className={`fixed top-0 left-0 h-full flex flex-col bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 backdrop-blur-xl border-r border-slate-700/30 shadow-2xl transition-transform duration-500 ease-out z-50
                 ${isPanelOpen ? 'translate-x-0' : '-translate-x-full'}`}
             style={{ width: '380px' }}
@@ -48,7 +48,7 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
                 onClick={() => setIsPanelOpen(!isPanelOpen)}
                 className="absolute -right-12 top-125 bg-linear-to-br from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 text-slate-100 p-3 rounded-r-xl border border-l-0 border-slate-600/40 transition-all duration-300 hover:shadow-[0_0_20px_rgba(148,163,184,0.3)] hover:translate-x-1 group"
                 aria-label={isPanelOpen ? 'Close panel' : 'Open panel'}
-            >   
+            >
                 {isPanelOpen ? (
                     <ChevronLeft size={22} className="group-hover:-translate-x-0.5 transition-transform" />
                 ) : (
@@ -81,37 +81,38 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
                 </div>
             )}
 
-            {/* Earthquake List */}
+            {/* Filter */}
             {visible && (
-                <select className="m-5 mx-6 mb-4 px-3 py-2 bg-slate-900/50 text-slate-300 rounded-md border border-slate-700/30 text-sm focus:ring-2 focus:ring-slate-500 focus:outline-none"
+                <select
+                    className="m-5 mx-6 mb-4 px-3 py-2 bg-slate-900/50 text-slate-300 rounded-md border border-slate-700/30 text-sm focus:ring-2 focus:ring-slate-500 focus:outline-none"
                     value={magByFilter}
                     onChange={(e) => setMagByFilter(e.target.value)}
                 >
-                    <option className='bg-slate-900' value="all">All Magnitudes</option>
-                    <option className='bg-slate-900' value="minor">Minor (M &lt; 2.5)</option>
-                    <option className='bg-slate-900' value="light">Light (2.5 &le; M &lt; 4.5)</option>
-                    <option className='bg-slate-900' value="moderate">Moderate (4.5 &le; M &lt; 6.0)</option>
-                    <option className='bg-slate-900' value="strong">Strong (6.0 &le; M &lt; 7.0)</option>
-                    <option className='bg-slate-900' value="major">Major (M &ge; 7.0)</option>
+                    <option className="bg-slate-900" value="all">All Magnitudes</option>
+                    <option className="bg-slate-900" value="minor">Minor (M &lt; 2.5)</option>
+                    <option className="bg-slate-900" value="light">Light (2.5 &le; M &lt; 4.5)</option>
+                    <option className="bg-slate-900" value="moderate">Moderate (4.5 &le; M &lt; 6.0)</option>
+                    <option className="bg-slate-900" value="strong">Strong (6.0 &le; M &lt; 7.0)</option>
+                    <option className="bg-slate-900" value="major">Major (M &ge; 7.0)</option>
                 </select>
             )}
+
+            {/* Earthquake List */}
             <ul className="flex-1 min-h-0 overflow-y-auto px-3 py-2 space-y-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
                 {filteredEarthquakes.map((eq) => {
                     const { mag, place, time, magType } = eq.properties;
-                    
+
                     return (
-                        <Tooltip content={`${place} - ${new Date(time).toLocaleString()}`}>
-                            <li
-                                key={eq.id}
-                                className="group bg-slate-900/40 hover:bg-slate-800/60 rounded-xl p-4 transition-all duration-300 border border-slate-800/30 hover:border-slate-700/50 hover:shadow-lg hover:shadow-slate-900/50 hover:-translate-y-0.5"
-                            >
+                        <Tooltip key={eq.id} content={`${place} - ${new Date(time).toLocaleString()}`}>
+                            <li className="group bg-slate-900/40 hover:bg-slate-800/60 rounded-xl p-4 transition-all duration-300 border border-slate-800/30 hover:border-slate-700/50 hover:shadow-lg hover:shadow-slate-900/50 hover:-translate-y-0.5">
                                 <div className="flex items-start gap-4">
-                                    <div 
-                                    onClick={() => focusOnEarthquake(eq.id, camera)}
-                                    className={`w-14 h-14 rounded-xl bg-linear-to-br ${getMagnitudeStyle(mag)} flex items-center cursor-pointer justify-center font-bold text-lg shadow-lg transition-transform group-hover:scale-110`}>
+                                    <div
+                                        onClick={() => focusOnEarthquake(eq.id, camera)}
+                                        className={`w-14 h-14 rounded-xl bg-linear-to-br ${getMagnitudeStyle(mag)} flex items-center cursor-pointer justify-center font-bold text-lg shadow-lg transition-transform group-hover:scale-110`}
+                                    >
                                         {mag !== null ? mag.toFixed(1) : '–'}
                                     </div>
-                                    
+
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-semibold text-slate-100 truncate group-hover:text-white transition-colors">
                                             {place || 'Unknown location'}
@@ -125,13 +126,19 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
                                             </span>
                                         </div>
                                     </div>
+
                                     <div
                                         onClick={() => {
-                                            handleSaveEarthquake(eq.properties.detail, user?.id || '').then(() => {
-                                                triggerToast();
+                                            handleSaveEarthquake(eq.properties.detail, user?.id || '').then((result) => {
+                                                if (result.success && result.message !== 'Earthquake saved successfully') {
+                                                    triggerToast('Already saved! Choose another one.');
+                                                } else {
+                                                    triggerToast('Earthquake saved!');
+                                                }
                                             });
                                         }}
-                                        className='hover:border-slate-700/50 hover:bg-slate-600/50 p-1 rounded-md transition-opacity opacity-0 group-hover:opacity-100'>
+                                        className="hover:border-slate-700/50 hover:bg-slate-600/50 p-1 rounded-md transition-opacity opacity-0 group-hover:opacity-100"
+                                    >
                                         <Save className="w-5 h-5 text-slate-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity" />
                                     </div>
                                 </div>
@@ -140,13 +147,6 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
                     );
                 })}
 
-                {/* Show Toast */}
-                {showToast && (
-                    <div className='center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50'>
-                        Earthquake saved!
-                    </div>
-                )}
-                
                 {!loading && earthquakes.length === 0 && (
                     <li className="px-6 py-12 text-center">
                         <div className="text-slate-600 text-4xl mb-3">🌍</div>
@@ -154,6 +154,13 @@ export const InfoPanel = ({ earthquakes, loading, error, lastUpdated, camera }: 
                     </li>
                 )}
             </ul>
+
+            {/* Toast */}
+            {toastMessage && (
+                <div className="absolute left-1/2 top-5 -translate-x-1/2 bg-white text-black px-4 py-2 rounded-md shadow-lg z-50 pointer-events-none">
+                    {toastMessage}
+                </div>
+            )}
         </div>
     );
 };

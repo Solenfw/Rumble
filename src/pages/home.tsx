@@ -48,6 +48,7 @@ export default function Home() {
   const [lastUpdated, setLastUpdated] = useState("");
   
   const [saved, setSaved] = useState<any[]>([]);
+  const [savedLoaded, setSavedLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
 
 
@@ -79,11 +80,16 @@ export default function Home() {
 }, []);
 
   useEffect(() => {
-    if (tab === "storage") {
+    if (tab === "storage" && !savedLoaded) {
       setLoading(true);
-      fetchSavedEarthquakes().then(setSaved).finally(() => setLoading(false));
+      fetchSavedEarthquakes()
+        .then((data) => {
+          setSaved(data);
+          setSavedLoaded(true);
+        })
+        .finally(() => setLoading(false));
     }
-  }, [tab]);
+  }, [tab, savedLoaded]);
 
   return (
     <div className="h-screen bg-[#1f1f1f] text-black font-mono flex flex-col">
@@ -122,6 +128,12 @@ export default function Home() {
                   <p className="font-semibold truncate">{eq.place}</p>
                 </Link>
               ))}
+            </div>
+          )}
+          {tab === "storage" && !loading && saved.length === 0 && (
+            <div className="text-center text-gray-500 mt-20">
+              <p className="text-xl">No saved earthquakes yet.</p>
+              <p className="text-sm mt-2">Explore the globe and save earthquakes to see them here.</p>
             </div>
           )}
         </main>

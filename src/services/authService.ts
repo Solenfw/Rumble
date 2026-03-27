@@ -29,7 +29,10 @@ export const handleEmailSignIn = async (
 
 export const handleSignOut = async () => {
     await supabase.auth.signOut();
-    window.location.href = '/'; // Redirect to sign-in page after signing out
+    // Clear any cached auth data and force a page reload to ensure clean state
+    sessionStorage.clear();
+    localStorage.clear();
+    window.location.href = '/signin';
 };
 
 
